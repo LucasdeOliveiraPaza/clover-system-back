@@ -1,0 +1,2 @@
+def listarEntregas():
+    return []
