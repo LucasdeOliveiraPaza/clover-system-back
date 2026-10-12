@@ -21,21 +21,53 @@ app.add_middleware(
 )
 
 
-class credenciais(BaseModel):
+class credenciaisModel(BaseModel):
     login: str
     senha: str
 
 
+class usuarioModel(BaseModel):
+    nome: str = ""
+    login: str = ""
+    tipo: str = ""
+    senha: str = ""
+
+
 @app.post("/api/login")
-def login(credenciais: credenciais):
+def login(credenciais: credenciaisModel):
     return autenticacao.logar(credenciais.login, credenciais.senha)
 
 
-@app.get("/api/entregas")
+@app.get("/api/entrega")
 def listarEntregas(usu: dict = Depends(autenticacao.checar_autorizacao_usuario)):
     return entrega.listarEntregas()
 
 
-@app.get("/api/usuarios")
+@app.get("/api/usuario")
 def listarUsuarios(usu: dict = Depends(autenticacao.checar_autorizacao_usuario)):
     return usuario.listarUsuarios()
+
+
+@app.post("/api/usuario")
+def inserirUsuario(
+    dados: usuarioModel, usu: dict = Depends(autenticacao.checar_autorizacao_usuario)
+):
+    usuario.inserirUsuario(dados)
+
+
+@app.put("/api/usuario/{id}")
+def atualizarUsuario(
+    id,
+    dados: usuarioModel,
+    usu: dict = Depends(autenticacao.checar_autorizacao_usuario),
+):
+    usuario.atualizarUsuario(id, nome=dados.nome, login=dados.login, tipo=dados.tipo)
+
+
+@app.put("/api/senha_usuario/{id}")
+def atualizarSenha(
+    id,
+    dados: usuarioModel,
+    usu: dict = Depends(autenticacao.checar_autorizacao_usuario),
+):
+    usuario.atualizarUsuario(id, senha=dados.senha)

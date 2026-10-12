@@ -52,7 +52,9 @@ def logar(login: str, senha: str):
 security = HTTPBearer()
 
 
-def checar_autorizacao_usuario(credentials: HTTPAuthorizationCredentials = Depends(security)):
+def checar_autorizacao_usuario(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+):
     token = credentials.credentials
 
     try:
