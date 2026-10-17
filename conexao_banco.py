@@ -11,6 +11,8 @@ def executar_funcao_sql(request: str) -> any:
     cursor = None
     conection = None
 
+    load_dotenv()
+
     try:
         conection = psycopg2.connect(
             database=os.getenv("DB_NAME"),
