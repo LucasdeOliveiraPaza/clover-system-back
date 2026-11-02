@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import entrega as entrega
 import usuario as usuario
 import autenticacao as autenticacao
@@ -36,6 +36,19 @@ class recebimentoModel(BaseModel):
     assinatura: str
     foto: str
 
+class entregaModel(BaseModel):
+    idVenda: int
+    entregador: int | None = None
+    descricao: str = ""
+    nomeComprador: str = Field(min_length=1)
+    contato: str = Field(min_length=1)
+    cep: str = Field(min_length=1)
+    bairro: str = Field(min_length=1)
+    rua: str = Field(min_length=1)
+    numero: str = Field(min_length=1)
+    complemento: str = ""
+
+
 @app.post("/api/login")
 def login(credenciais: credenciaisModel):
     return autenticacao.logar(credenciais.login, credenciais.senha)
@@ -44,6 +57,29 @@ def login(credenciais: credenciaisModel):
 @app.get("/api/entrega")
 def listarEntregas(usu: dict = Depends(autenticacao.checar_autorizacao_usuario)):
     return entrega.listarEntregas()
+
+
+@app.get("/api/entregador")
+def listarEntregadores(usu: dict = Depends(autenticacao.checar_autorizacao_usuario)):
+    return entrega.listarEntregadores()
+
+
+@app.post("/api/entrega")
+def inserirEntrega(
+    dados: entregaModel, usu: dict = Depends(autenticacao.checar_autorizacao_usuario)
+):
+    entrega.exigirGerente(usu)
+    return entrega.inserirEntrega(dados, int(usu["id"]))
+
+
+@app.put("/api/entrega/{id_entrega}")
+def atualizarEntrega(
+    id_entrega: int,
+    dados: entregaModel,
+    usu: dict = Depends(autenticacao.checar_autorizacao_usuario),
+):
+    entrega.exigirGerente(usu)
+    return entrega.atualizarEntrega(id_entrega, dados, int(usu["id"]))
 
 
 @app.get("/api/usuario")
