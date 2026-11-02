@@ -40,3 +40,25 @@ def listarEntregas():
             }
         )
     return ret
+
+def buscarDestinoEntrega(idEntrega: int):
+    request = f"""
+        SELECT CONCAT(e.rua, ', ', e.numero, ', ', e.cep, ', ', e.bairro, ', ', 'Caçador - SC') endereco FROM entregas e
+        WHERE e.id_entrega = {idEntrega}
+    """
+
+    busca = conexao_banco.executar_funcao_sql(request)
+
+    return busca[0]["endereco"];
+
+def finalizarEntrega(idEntrega: int, assinatura: str, foto: str):
+    request = f"""
+        UPDATE entregas SET
+            status = 3,
+            assinatura_eletronica = '{assinatura}',
+            imagem_comprovante = '{foto}'
+        WHERE
+            id_entrega = {idEntrega}
+    """
+
+    conexao_banco.executar_funcao_sql(request)

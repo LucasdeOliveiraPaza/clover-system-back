@@ -32,6 +32,9 @@ class usuarioModel(BaseModel):
     tipo: str = ""
     senha: str = ""
 
+class recebimentoModel(BaseModel):
+    assinatura: str
+    foto: str
 
 @app.post("/api/login")
 def login(credenciais: credenciaisModel):
@@ -71,3 +74,12 @@ def atualizarSenha(
     usu: dict = Depends(autenticacao.checar_autorizacao_usuario),
 ):
     usuario.atualizarUsuario(id, senha=dados.senha)
+
+@app.get("/api/destino_entrega/{id}")
+def listarEntregas(id, usu: dict = Depends(autenticacao.checar_autorizacao_usuario)):
+    return entrega.buscarDestinoEntrega(id)
+
+@app.post("/api/finalizar_entrega/{id}")
+def listarEntregas(id, dados: recebimentoModel, usu: dict = Depends(autenticacao.checar_autorizacao_usuario)):
+    entrega.finalizarEntrega(id, dados.assinatura, dados.foto)
+
